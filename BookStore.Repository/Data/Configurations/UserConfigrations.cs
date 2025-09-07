@@ -22,6 +22,7 @@ namespace BookStore.Repository.Data.Configurations
             builder.Property(U => U.LastName).IsRequired().HasMaxLength(50);
 
             builder.HasMany(U => U.Orders).WithOne(O=>O.User).HasForeignKey(O => O.UserId).OnDelete(DeleteBehavior.SetNull);
+            builder.OwnsMany(U => U.RefreshTokens);
         }
     }
 }
