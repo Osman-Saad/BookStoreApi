@@ -1,11 +1,6 @@
 ﻿using BookStore.Core.IServices;
 using StackExchange.Redis;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace BookStore.Services
 {
@@ -20,9 +15,9 @@ namespace BookStore.Services
         {
             if (response != null)
             {
-                var jsonOption = new JsonSerializerOptions{PropertyNamingPolicy = JsonNamingPolicy.CamelCase};
+                var jsonOption = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
                 var responseJson = JsonSerializer.Serialize(response, jsonOption);
-               await database.StringSetAsync(key, responseJson, timeSpan);
+                await database.StringSetAsync(key, responseJson, timeSpan);
             }
         }
 

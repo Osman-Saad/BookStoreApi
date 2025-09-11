@@ -1,4 +1,6 @@
-﻿namespace BookStore.Api.Dtos
+﻿using BookStore.Api.UsersDto.Dtos;
+
+namespace BookStore.Api.Dtos.AuthDto
 {
     public class AuthResponseDto : UserDto
     {

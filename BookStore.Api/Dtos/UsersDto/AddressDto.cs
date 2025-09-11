@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BookStore.Api.Dtos
+namespace BookStore.Api.Dtos.UsersDto.UserDto
 {
     public class AddressDto
     {

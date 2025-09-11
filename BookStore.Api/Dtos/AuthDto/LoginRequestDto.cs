@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BookStore.Api.Dtos
+namespace BookStore.Api.Dtos.AuthDto
 {
     public class LoginRequestDto
     {

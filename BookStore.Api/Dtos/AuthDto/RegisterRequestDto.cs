@@ -1,6 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BookStore.Api.Dtos.UsersDto.UserDto;
+using System.ComponentModel.DataAnnotations;
 
-namespace BookStore.Api.Dtos
+namespace BookStore.Api.Dtos.AuthDto
 {
     public class RegisterRequestDto
     {
