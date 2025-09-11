@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
 using BookStore.Api.Dtos;
+using BookStore.Api.Dtos.AuthDto;
+using BookStore.Api.Dtos.UsersDto.UserDto;
 using BookStore.Api.Errors;
 using BookStore.Api.Helpers;
+using BookStore.Api.UsersDto.Dtos;
 using BookStore.Core;
 using BookStore.Core.IServices;
 using BookStore.Core.Models;

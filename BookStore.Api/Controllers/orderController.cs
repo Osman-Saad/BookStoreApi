@@ -7,20 +7,19 @@ using BookStore.Core;
 using BookStore.Core.IServices;
 using BookStore.Core.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace BookStore.Api.Controllers
 {
-    
+
     public class orderController : BaseController
     {
         private readonly IOrderServices orderServices;
         private readonly IMapper mapper;
         private readonly IUnitOfWork unitOfWork;
 
-        public orderController(IOrderServices orderServices,IMapper mapper,IUnitOfWork unitOfWork)
+        public orderController(IOrderServices orderServices, IMapper mapper, IUnitOfWork unitOfWork)
         {
             this.orderServices = orderServices;
             this.mapper = mapper;
@@ -28,9 +27,9 @@ namespace BookStore.Api.Controllers
         }
 
         [HttpPost("{basketId}")]
-        [Authorize(Roles =Roles.Customer)]
-        [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(OrderDto),StatusCodes.Status200OK)]
+        [Authorize(Roles = Roles.Customer)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(OrderDto), StatusCodes.Status200OK)]
         public async Task<ActionResult<OrderDto>> CreateOrder([FromRoute] string basketId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -43,8 +42,8 @@ namespace BookStore.Api.Controllers
 
         [HttpGet("{orderId}")]
         [Authorize]
-        [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(OrderDto),StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(OrderDto), StatusCodes.Status200OK)]
         public async Task<ActionResult<OrderDto>> GetOrder(int orderId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -57,7 +56,7 @@ namespace BookStore.Api.Controllers
 
         [HttpGet]
         [Authorize]
-        [ProducesResponseType(typeof(IReadOnlyList<OrderDto>),StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IReadOnlyList<OrderDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IReadOnlyList<OrderDto>>> GetOrders()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -68,8 +67,8 @@ namespace BookStore.Api.Controllers
 
         [HttpPut]
         [Authorize(Roles = Roles.Admin)]
-        [ProducesResponseType(typeof(MessageResponse),StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> UpdateOrderStatus([FromQuery] int orderId, [FromQuery] string orderStatus)
         {
             var order = await unitOfWork.Repository<Order>().GetByIdAsync(orderId);
@@ -77,7 +76,7 @@ namespace BookStore.Api.Controllers
                 return NotFound(new ApiResponse(404));
             if (!Enum.TryParse(typeof(OrderStatus), orderStatus, out var parsedStatus))
                 return BadRequest(new ApiResponse(400));
-            order.OrderStatus = (OrderStatus) parsedStatus;
+            order.OrderStatus = (OrderStatus)parsedStatus;
             await unitOfWork.CompleteAsync();
             return Ok(new MessageResponse()
             {

@@ -1,13 +1,14 @@
 ﻿
 
 using AutoMapper;
-using BookStore.Api.Dtos;
 using BookStore.Api.Dtos.Author;
 using BookStore.Api.Dtos.BooksDto;
 using BookStore.Api.Dtos.Category;
 using BookStore.Api.Dtos.OrderDto;
 using BookStore.Api.Dtos.Publisher;
+using BookStore.Api.Dtos.UsersDto.UserDto;
 using BookStore.Api.Helpers;
+using BookStore.Api.UsersDto.Dtos;
 using BookStore.Core.Models;
 using BookStore.Core.Specification.Projections;
 
@@ -35,8 +36,8 @@ namespace BookStore.Api.Profiles
                 .ForMember(D => D.CoverUrl, O => O.MapFrom<BookCoverUrlResolver>());
 
             CreateMap<Order, OrderDto>();
-            CreateMap<OrderItem,OrderItemDto>()
-                .ForMember(D => D.UnitPice, O => O.MapFrom(S=>S.Price));
+            CreateMap<OrderItem, OrderItemDto>()
+                .ForMember(D => D.UnitPice, O => O.MapFrom(S => S.Price));
 
         }
     }

@@ -30,7 +30,7 @@ namespace BookStore.Api.Helpers
                 return;
             }
             var executingEndpoint = await next();
-            if(executingEndpoint.Result is OkObjectResult okResult )
+            if (executingEndpoint.Result is OkObjectResult okResult)
             {
                 await cachedService.CacheResponse(key, okResult.Value, TimeSpan.FromSeconds(timeInSecound));
             }
@@ -40,7 +40,7 @@ namespace BookStore.Api.Helpers
         {
             var keyBuilder = new StringBuilder();
             keyBuilder.Append(request.Path);
-            foreach(var (k,v) in request.Query.OrderBy(Q => Q.Key))
+            foreach (var (k, v) in request.Query.OrderBy(Q => Q.Key))
             {
                 keyBuilder.Append($"|{k}-{v}");
             }

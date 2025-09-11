@@ -1,4 +1,7 @@
-﻿namespace BookStore.Api.Dtos
+﻿
+using BookStore.Api.Dtos.UsersDto.UserDto;
+
+namespace BookStore.Api.UsersDto.Dtos
 {
     public class UserDto
     {
