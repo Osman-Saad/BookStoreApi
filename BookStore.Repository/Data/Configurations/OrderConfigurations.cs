@@ -1,11 +1,6 @@
 ﻿using BookStore.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BookStore.Repository.Data.Configurations
 {
@@ -18,7 +13,7 @@ namespace BookStore.Repository.Data.Configurations
                                OrderStatusString => (OrderStatus)Enum.Parse(typeof(OrderStatus), OrderStatusString));
             builder.Property(O => O.TotalPrice).IsRequired().HasColumnType("decimal(18,2)");
 
-            builder.HasMany(O => O.Items).WithOne(OI=>OI.Order).HasForeignKey(O => O.OrderId).OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(O => O.Items).WithOne(OI => OI.Order).HasForeignKey(O => O.OrderId).OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

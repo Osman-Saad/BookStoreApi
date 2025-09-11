@@ -1,6 +1,5 @@
 ﻿using BookStore.Api.Errors;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace BookStore.Api.Moddlewares
 {

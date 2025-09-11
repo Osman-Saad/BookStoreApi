@@ -6,14 +6,11 @@ using BookStore.Core;
 using BookStore.Core.IServices;
 using BookStore.Core.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net.Mail;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace BookStore.Api.Controllers
 {
@@ -45,8 +42,8 @@ namespace BookStore.Api.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<AuthResponseDto>> RegisterAsCustomer([FromBody] RegisterRequestDto registerRequest)
         {
-            if(CheckEmail(registerRequest.Email).Result.Value)
-                return BadRequest(new ApiResponse(400,"Email is already exist"));
+            if (CheckEmail(registerRequest.Email).Result.Value)
+                return BadRequest(new ApiResponse(400, "Email is already exist"));
             var user = new AppUser
             {
                 Email = registerRequest.Email,
@@ -57,9 +54,9 @@ namespace BookStore.Api.Controllers
                 Address = mapper.Map<UserAddress>(registerRequest.Address)
             };
             var result = await userManager.CreateAsync(user, registerRequest.Password);
-            if(!result.Succeeded)
-                return BadRequest(new ApiResponse(400,string.Join(",", result.Errors.Select(E => E.Description))));
-            if(registerRequest.IsAdmin)
+            if (!result.Succeeded)
+                return BadRequest(new ApiResponse(400, string.Join(",", result.Errors.Select(E => E.Description))));
+            if (registerRequest.IsAdmin)
                 await userManager.AddToRoleAsync(user, Roles.Admin);
             else
                 await userManager.AddToRoleAsync(user, Roles.Customer);
@@ -88,7 +85,7 @@ namespace BookStore.Api.Controllers
             var user = await userManager.FindByEmailAsync(loginRequest.Email);
             if (user is null) return Unauthorized(new ApiResponse(400, "Email Or Password Is Not Correct"));
             var passwordValid = await userManager.CheckPasswordAsync(user, loginRequest.Password);
-            if(!passwordValid) return Unauthorized(new ApiResponse(400, "Email Or Password Is Not Correct"));
+            if (!passwordValid) return Unauthorized(new ApiResponse(400, "Email Or Password Is Not Correct"));
             var refreshToken = tokenService.GetRefreshToken();
             user.RefreshTokens.Add(refreshToken);
             await userManager.UpdateAsync(user);
@@ -104,17 +101,17 @@ namespace BookStore.Api.Controllers
                 Token = await tokenService.GetAccessToken(user, userManager),
                 RefreshToken = refreshToken.Token
             };
-            return Ok(response);    
+            return Ok(response);
         }
 
         [HttpGet("me")]
         [Authorize]
-        [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(UserDto),StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
         public async Task<ActionResult<UserDto>> GetCurrentUser()
         {
             var email = User.FindFirstValue(ClaimTypes.Email);
-            var user  = await userManager.FindByEmailAsync(email);
+            var user = await userManager.FindByEmailAsync(email);
             if (user is null) return NotFound(new ApiResponse(404, "User Not Found"));
             var response = mapper.Map<UserDto>(user);
             return Ok(response);
@@ -125,12 +122,12 @@ namespace BookStore.Api.Controllers
         {
             Console.WriteLine(refreshToken);
             var user = await userManager.Users
-                .Include(U=>U.RefreshTokens)
-                .FirstOrDefaultAsync(U=>U.RefreshTokens.Any(R=>R.Token.Trim() == refreshToken.Trim()));
-            if (user is null) return Unauthorized(new ApiResponse(401,"Invalid Refresh Tokenm"));
-            var token  = user.RefreshTokens.FirstOrDefault(R => R.Token == refreshToken);
-            if(token is null || !token.IsActive) 
-                return Unauthorized(new ApiResponse(401, "Invalid Refresh Token")); 
+                .Include(U => U.RefreshTokens)
+                .FirstOrDefaultAsync(U => U.RefreshTokens.Any(R => R.Token.Trim() == refreshToken.Trim()));
+            if (user is null) return Unauthorized(new ApiResponse(401, "Invalid Refresh Tokenm"));
+            var token = user.RefreshTokens.FirstOrDefault(R => R.Token == refreshToken);
+            if (token is null || !token.IsActive)
+                return Unauthorized(new ApiResponse(401, "Invalid Refresh Token"));
             token.RevokeOn = DateTime.UtcNow;
             var accessToken = await tokenService.GetAccessToken(user, userManager);
             var newRefreshToken = tokenService.GetRefreshToken();
@@ -145,7 +142,7 @@ namespace BookStore.Api.Controllers
 
         [HttpPost("logout")]
         [Authorize]
-        [ProducesResponseType(typeof(MessageResponse),StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status200OK)]
         public async Task<ActionResult> Logout(string refreshToken)
         {
             var email = User.FindFirstValue(ClaimTypes.Email);
@@ -153,7 +150,7 @@ namespace BookStore.Api.Controllers
             var token = user.RefreshTokens.FirstOrDefault(R => R.Token == refreshToken);
             token.RevokeOn = DateTime.UtcNow;
             await userManager.UpdateAsync(user);
-           return Ok(new MessageResponse() { Message = "Logout Successfuly" });
+            return Ok(new MessageResponse() { Message = "Logout Successfuly" });
         }
 
         [HttpPost("change-password")]
@@ -167,8 +164,8 @@ namespace BookStore.Api.Controllers
             var user = await userManager.FindByEmailAsync(email);
             if (user is null) return NotFound(new ApiResponse(404, "User Not Found"));
             var result = await userManager.ChangePasswordAsync(user, changePasswordRequestDto.OldPassword, changePasswordRequestDto.NewPassword);
-            if(!result.Succeeded) return BadRequest(new ApiResponse(400, string.Join(",", result.Errors.Select(E => E.Description))));
-            return Ok(new MessageResponse() { Message = "Passsword Changed Successfully" });    
+            if (!result.Succeeded) return BadRequest(new ApiResponse(400, string.Join(",", result.Errors.Select(E => E.Description))));
+            return Ok(new MessageResponse() { Message = "Passsword Changed Successfully" });
         }
 
         [HttpDelete("delete-account")]
@@ -211,7 +208,7 @@ namespace BookStore.Api.Controllers
         {
             var user = await userManager.FindByIdAsync(userDto.UserId);
             if (user is null) return NotFound(new ApiResponse(404, "User Not Found"));
-            if(!string.IsNullOrEmpty(userDto.FirstName))
+            if (!string.IsNullOrEmpty(userDto.FirstName))
                 user.FirstName = userDto.FirstName;
             if (!string.IsNullOrEmpty(userDto.LastName))
                 user.LastName = userDto.LastName;
@@ -245,7 +242,7 @@ namespace BookStore.Api.Controllers
         [Authorize(Roles = Roles.Admin)]
         public async Task<ActionResult<IReadOnlyList<UserDto>>> GetAllUsers()
         {
-            var users = await userManager.Users.Include(U=>U.Address).ToListAsync();
+            var users = await userManager.Users.Include(U => U.Address).ToListAsync();
             var response = mapper.Map<IReadOnlyList<UserDto>>(users);
             return Ok(response);
         }

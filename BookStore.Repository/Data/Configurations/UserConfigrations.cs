@@ -1,11 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BookStore.Core.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using BookStore.Core.Models;
 namespace BookStore.Repository.Data.Configurations
 {
     class UserConfigrations : IEntityTypeConfiguration<AppUser>
@@ -21,7 +16,7 @@ namespace BookStore.Repository.Data.Configurations
             builder.Property(U => U.FirstName).IsRequired().HasMaxLength(50);
             builder.Property(U => U.LastName).IsRequired().HasMaxLength(50);
 
-            builder.HasMany(U => U.Orders).WithOne(O=>O.User).HasForeignKey(O => O.UserId).OnDelete(DeleteBehavior.SetNull);
+            builder.HasMany(U => U.Orders).WithOne(O => O.User).HasForeignKey(O => O.UserId).OnDelete(DeleteBehavior.SetNull);
             builder.OwnsMany(U => U.RefreshTokens);
         }
     }

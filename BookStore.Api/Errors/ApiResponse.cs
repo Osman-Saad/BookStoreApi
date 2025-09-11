@@ -5,7 +5,7 @@
         public int StatusCode { get; set; }
         public string Message { get; set; }
 
-        public ApiResponse(int StatusCode,string? Message=null)
+        public ApiResponse(int StatusCode, string? Message = null)
         {
             this.StatusCode = StatusCode;
             this.Message = string.IsNullOrEmpty(Message) ? GetErrorMessage(StatusCode) : Message;

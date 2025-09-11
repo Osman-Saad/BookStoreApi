@@ -21,6 +21,14 @@ namespace BookStore.Api.Controllers
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
+            try
+            {
+                throw new Exception("WeatherForecast Exception");
+            }
+            catch
+            {
+                _logger.LogError("This is Exception");
+            }
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),

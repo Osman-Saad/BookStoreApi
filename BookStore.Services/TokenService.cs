@@ -3,14 +3,10 @@ using BookStore.Core.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 using System.Security.Cryptography;
+using System.Text;
 namespace BookStore.Services
 {
     public class TokenService : ITokenService
@@ -25,16 +21,17 @@ namespace BookStore.Services
         {
             List<Claim> claims = new List<Claim>()
             {
+                new Claim(ClaimTypes.NameIdentifier,user.Id),
                 new Claim(ClaimTypes.Email,user.Email!),
                 new Claim(ClaimTypes.MobilePhone,user.PhoneNumber!),
                 new Claim(ClaimTypes.Name,user.UserName!),
 
             };
             var roles = await userManager.GetRolesAsync(user);
-            foreach(var role in roles)
+            foreach (var role in roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
-            }   
+            }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!));
 
@@ -57,7 +54,7 @@ namespace BookStore.Services
                 Token = refreshToken,
                 ExpireOn = DateTime.UtcNow.AddDays(7)
             };
-            
+
         }
 
         private string GenerateRefreshToken()
