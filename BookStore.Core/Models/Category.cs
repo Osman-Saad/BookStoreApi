@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BookStore.Core.Models
+﻿namespace BookStore.Core.Models
 {
-    public class Category: BaseEntity
+    public class Category : BaseEntity
     {
         public string Name { get; set; }
         public string? Description { get; set; }
-        public ICollection<Book> Books { get; set; }
+        public ICollection<Book> Books { get; set; } = new HashSet<Book>();
     }
 }

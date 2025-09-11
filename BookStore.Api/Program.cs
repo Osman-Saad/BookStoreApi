@@ -1,40 +1,53 @@
 using BookStore.Api.Errors;
+using BookStore.Api.Helpers;
 using BookStore.Api.Moddlewares;
 using BookStore.Api.Profiles;
 using BookStore.Core;
+using BookStore.Core.IRepositories;
 using BookStore.Core.IServices;
 using BookStore.Core.Models;
 using BookStore.Repository;
 using BookStore.Repository.Data;
 using BookStore.Repository.Data.Seeding;
+using BookStore.Repository.Repositories;
 using BookStore.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
+using StackExchange.Redis;
 using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<BookStoreDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(option =>
+{
+    var connection = builder.Configuration.GetConnectionString("RedisConnection");
+    return ConnectionMultiplexer.Connect(connection);
+});
 builder.Services.AddAutoMapper(typeof(MapperProfile));
-builder.Services.AddIdentity<AppUser,IdentityRole>()
+builder.Services.AddIdentity<AppUser, IdentityRole>()
     .AddEntityFrameworkStores<BookStoreDbContext>()
     .AddDefaultTokenProviders();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IBasketRepository, BasketRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<ICachedService, CachedResponseService>();
+builder.Services.AddScoped<FileManager>();
+builder.Services.AddScoped<IOrderServices, OrderService>();
 builder.Services.AddAuthentication(option =>
 {
     option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -70,6 +83,9 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
     };
 });
 
+var seriLogger = new LoggerConfiguration().ReadFrom.Configuration(builder.Configuration).CreateLogger();
+builder.Logging.AddSerilog(seriLogger);
+
 var app = builder.Build();
 
 var scope = app.Services.CreateScope();
@@ -81,9 +97,9 @@ try
     var dbContext = services.GetRequiredService<BookStoreDbContext>();
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
     await dbContext.Database.MigrateAsync();
-    await BookStoreSeedContext.SeedRolesAsync(roleManager);
+    await BookStoreSeedContext.SeedAsync(dbContext, roleManager);
 }
-catch(Exception ex) 
+catch (Exception ex)
 {
     var logger = loggerFactory.CreateLogger<Program>();
     logger.LogError(ex.Message);
@@ -95,6 +111,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseStaticFiles();
+
 app.UseStatusCodePagesWithReExecute("/errors/{0}");
 app.UseHttpsRedirection();
 

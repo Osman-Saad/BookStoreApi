@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BookStore.Core.Models
+﻿namespace BookStore.Core.Models
 {
-    public class OrderItem:BaseEntity
+    public class OrderItem : BaseEntity
     {
         public int BookId { get; set; }
         public string BookName { get; set; }

@@ -11,7 +11,7 @@ namespace BookStore.Api.Dtos
         [EmailAddress]
         public string Email { get; set; }
         [Phone]
-        public string  PhoneNumber { get; set; }
+        public string PhoneNumber { get; set; }
         [MinLength(8)]
         public string Password { get; set; }
         public AddressDto Address { get; set; }
